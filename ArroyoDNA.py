@@ -1,3 +1,12 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import streamlit as st
+import io
+import requests
+
+
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%201.xlsx'
 response = requests.get(file_url)
