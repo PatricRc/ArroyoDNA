@@ -6,12 +6,19 @@ import streamlit as st
 import io
 import requests
 
-
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%201.xlsx'
-response = requests.get(file_url)
-file_data = io.BytesIO(response.content)
-df = pd.read_excel(file_data, sheet_name='Sheet1')
+try:
+    response = requests.get(file_url)
+    response.raise_for_status()  # Raise an error for bad status codes
+    file_data = io.BytesIO(response.content)
+    df = pd.read_excel(file_data, engine='openpyxl', sheet_name='Sheet1')
+except requests.exceptions.RequestException as e:
+    st.error(f"Error loading the dataset: {e}")
+    st.stop()
+except ValueError as e:
+    st.error(f"Error reading the Excel file: {e}")
+    st.stop()
 
 # Streamlit app setup
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
