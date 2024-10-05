@@ -9,7 +9,6 @@ from sklearn.ensemble import RandomForestRegressor
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
 from pandasai.responses.response_parser import ResponseParser
-from pandasai.callbacks import StdoutCallback
 import os
 import yaml
 
@@ -276,6 +275,9 @@ elif page == "Survey Chatbot":
                     },
                 )
 
+                answer = query_engine.chat(query)
+        except Exception as e:
+            st.error(f"Error processing the file: {e}")
                 answer = query_engine.chat(query)
         except Exception as e:
             st.error(f"Error processing the file: {e}")
