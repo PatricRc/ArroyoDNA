@@ -68,7 +68,7 @@ st.subheader('Filtered Dataset')
 st.write(filtered_df)
 
 # Summary statistics
-with st.expander('Tables Section'):
+with st.expander('Analytics Section'):
     st.subheader('Summary Statistics')
     st.write(filtered_df.describe())
 
