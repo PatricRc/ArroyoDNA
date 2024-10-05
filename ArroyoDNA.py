@@ -37,23 +37,22 @@ st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='w
 st.title('📊 Employee Survey EDA')
 
 # Filters for DataFrame
-st.sidebar.header('Filter the Data')
 
-# Get top 20 roles by number of unique IDs in ascending order
+# Filters on the page
 top_20_roles = df.groupby('Rol ')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
 
 # Role filter for top 20 roles
-role_filter = st.sidebar.multiselect('Select Role', options=top_20_roles, default=top_20_roles)
+role_filter = st.multiselect('Select Role', options=top_20_roles, default=top_20_roles)
 
 # Country filter
-country_filter = st.sidebar.multiselect('Select Country', options=df['País'].unique(), default=df['País'].unique())
+country_filter = st.multiselect('Select Country', options=df['País'].unique(), default=df['País'].unique())
 
 # Age filter
-age_filter = st.sidebar.slider('Select Age Range', int(df['Edad'].min()), int(df['Edad'].max()), (int(df['Edad'].min()), int(df['Edad'].max())))
+age_filter = st.slider('Select Age Range', int(df['Edad'].min()), int(df['Edad'].max()), (int(df['Edad'].min()), int(df['Edad'].max())))
 
 # Numeric slicers
-months_in_company_filter = st.sidebar.slider('Select Meses en Arroyo Range', int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max()), (int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max())))
-experience_filter = st.sidebar.slider('Select Años de experiencia Range', int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max()), (int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max())))
+months_in_company_filter = st.slider('Select Meses en Arroyo Range', int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max()), (int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max())))
+experience_filter = st.slider('Select Años de experiencia Range', int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max()), (int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max())))
 
 # Filter DataFrame
 filtered_df = df[
@@ -141,6 +140,7 @@ st.write(english_level_counts)
 
 with st.beta_expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
+    
 st.subheader('Correlation Heatmap for Numerical Features')
 plt.figure(figsize=(10, 6))
 sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
