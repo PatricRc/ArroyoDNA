@@ -38,8 +38,10 @@ df = df[columns_to_keep]
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
 st.title('📊 Employee Survey EDA')
 
-# Filters for DataFrame
+# Sidebar sections
+st.sidebar.title('Survey EDA')
 
+# Filters for DataFrame
 # Filters on the page
 top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
 all_roles = df['Rol'].unique().tolist()
@@ -195,4 +197,9 @@ with st.expander('Visualizations Section'):
     plt.xlabel('Importance')
     plt.ylabel('Feature')
     st.pyplot(plt)
+
+# Sidebar sections
+st.sidebar.title('Machine Learning Prediction')
+st.sidebar.title('Survey Chatbot')
+
 
