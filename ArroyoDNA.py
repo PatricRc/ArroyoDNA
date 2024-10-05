@@ -8,7 +8,7 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 
 # Load the dataset from the GitHub repository
-file_url = 'https://github.com/PatricRc/ArroyoDNA/blob/main/Human%20Skills%20Resultados%20%201.xlsx'
+file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
 try:
     response = requests.get(file_url)
     response.raise_for_status()  # Raise an error for bad status codes
@@ -106,83 +106,51 @@ with st.expander('Analytics Section'):
     st.write('Breakdown by Nivel de Inglés')
     st.write(english_level_counts)
 
-    # Additional Analytics
-    st.subheader('Additional Analytics')
-    
-    # Top 10 By Roles
-    role_counts = df['Rol '].value_counts().head(10)
-    st.write('Top 10 By Roles')
-    st.write(role_counts)
-    
-    # Gender Breakdown
-    gender_counts = df['Genero'].value_counts()
-    st.write('Gender Breakdown')
-    st.write(gender_counts)
-    
-    # Top 10 by Age
-    age_counts = df['Edad'].value_counts().head(10)
-    st.write('Top 10 by Age')
-    st.write(age_counts)
-    
-    # Breakdown by Country
-    country_counts = df['País'].value_counts()
-    st.write('Breakdown by Country')
-    st.write(country_counts)
-    
-    # Top 10 by Years of Experience
-    experience_counts = df['Años de experiencia'].value_counts().head(10)
-    st.write('Top 10 by Years of Experience')
-    st.write(experience_counts)
-    
-    # Breakdown by Nivel de Inglés
-    english_level_counts = df['Nivel de inglés'].value_counts()
-    st.write('Breakdown by Nivel de Inglés')
-    st.write(english_level_counts)
-
 with st.expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
-    st.subheader('Correlation Heatmap for Numerical Features')
-    
     st.subheader('Correlation Heatmap for Numerical Features')
     plt.figure(figsize=(10, 6))
     sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
     st.pyplot(plt)
         
-    
     # Distribution of Age
     st.subheader('Distribution of Age')
     plt.figure(figsize=(10, 6))
     sns.histplot(filtered_df['Edad'], kde=True, color='blue')
     st.pyplot(plt)
         
-    
     # Gender Countplot
     st.subheader('Gender Distribution')
     plt.figure(figsize=(10, 6))
     sns.countplot(data=filtered_df, x='Genero', palette='Set2')
     st.pyplot(plt)
         
-    
     # Experience vs. Nivel de inglés
     st.subheader('Years of Experience vs. Nivel de inglés')
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
     st.pyplot(plt)
         
-    
     # Distribution of Nivel de inglés
     st.subheader('Distribution of Nivel de inglés')
     plt.figure(figsize=(10, 6))
     sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
     st.pyplot(plt)    
-    
+
+    # Relationship between Age and Nivel de inglés
+    st.subheader('Age vs. Nivel de inglés')
+    filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
+    filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
+    plt.figure(figsize=(10, 6))
+    sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
+    st.pyplot(plt)
+        
     # Pairplot to observe relationships between select numerical features
     st.subheader('Pairplot of Selected Numerical Features')
     selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
     sns.pairplot(filtered_df[selected_features], height=4)
     st.pyplot(plt)
         
-    
     # Summary of categorical features
     st.subheader('Summary of Categorical Features')
     st.write(filtered_df.describe(include=['object']))
@@ -194,7 +162,6 @@ with st.expander('Visualizations Section'):
     plt.xticks(rotation=45)
     st.pyplot(plt)
         
-    
     # Feature Importance Section
     st.subheader('Feature Importance for Predicting Employee Adaptability')
     
@@ -226,5 +193,3 @@ with st.expander('Visualizations Section'):
     plt.xlabel('Importance')
     plt.ylabel('Feature')
     st.pyplot(plt)
-        
-        
