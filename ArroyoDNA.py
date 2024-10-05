@@ -39,16 +39,14 @@ age_filter = st.sidebar.slider('Select Age Range', int(df['Edad'].min()), int(df
 # Numeric slicers
 months_in_company_filter = st.sidebar.slider('Select Meses en Arroyo Range', int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max()), (int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max())))
 experience_filter = st.sidebar.slider('Select Años de experiencia Range', int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max()), (int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max())))
-english_level_filter = st.sidebar.slider('Select Nivel de inglés', min_value=df['Nivel de inglés'].min(), max_value=df['Nivel de inglés'].max(), value=(df['Nivel de inglés'].min(), df['Nivel de inglés'].max()))
 
-# Apply filters to DataFrame
+# Filter DataFrame
 filtered_df = df[
     (df['Rol '].isin(role_filter)) &
     (df['País'].isin(country_filter)) &
     (df['Edad'] >= age_filter[0]) & (df['Edad'] <= age_filter[1]) &
     (df['Meses en Arroyo'] >= months_in_company_filter[0]) & (df['Meses en Arroyo'] <= months_in_company_filter[1]) &
-    (df['Años de experiencia'] >= experience_filter[0]) & (df['Años de experiencia'] <= experience_filter[1]) &
-    (df['Nivel de inglés'] >= english_level_filter[0]) & (df['Nivel de inglés'] <= english_level_filter[1])
+    (df['Años de experiencia'] >= experience_filter[0]) & (df['Años de experiencia'] <= experience_filter[1])
 ]
 
 # Display filtered DataFrame
@@ -57,7 +55,7 @@ st.write(filtered_df)
 
 # Summary statistics
 st.subheader('Summary Statistics')
-st.write(filtered_df.drop(columns=['ID']).describe())
+st.write(filtered_df.drop(columns=['ID', 'TOTAL']).describe())
 
 # Correlation Heatmap for Numerical Features
 st.subheader('Correlation Heatmap for Numerical Features')
@@ -104,8 +102,8 @@ st.pyplot(plt)
 
 # Pairplot to observe relationships between select numerical features
 st.subheader('Pairplot of Selected Numerical Features')
-selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'TOTAL']
-sns.pairplot(filtered_df[selected_features], hue='TOTAL', palette='coolwarm')
+selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia']
+sns.pairplot(filtered_df[selected_features])
 st.pyplot(plt)
 
 # Summary of categorical features
