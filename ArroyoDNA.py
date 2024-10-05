@@ -5,6 +5,8 @@ import numpy as np
 import streamlit as st
 import io
 import requests
+from sklearn.ensemble import RandomForestRegressor
+import ace_tools as tools
 
 # Load the dataset from the GitHub repository
 file_url = 'https://github.com/PatricRc/ArroyoDNA/raw/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -38,8 +40,11 @@ st.title('📊 Employee Survey EDA')
 # Filters for DataFrame
 st.sidebar.header('Filter the Data')
 
-# Role filter
-role_filter = st.sidebar.multiselect('Select Role', options=df['Rol '].unique(), default=df['Rol '].unique())
+# Get top 20 roles by number of unique IDs in ascending order
+top_20_roles = df.groupby('Rol ')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
+
+# Role filter for top 20 roles
+role_filter = st.sidebar.multiselect('Select Role', options=top_20_roles, default=top_20_roles)
 
 # Country filter
 country_filter = st.sidebar.multiselect('Select Country', options=df['País'].unique(), default=df['País'].unique())
@@ -127,3 +132,37 @@ plt.figure(figsize=(12, 6))
 sns.countplot(data=filtered_df, x='País', palette='viridis')
 plt.xticks(rotation=45)
 st.pyplot(plt)
+
+# Feature Importance Section
+st.subheader('Feature Importance for Predicting Employee Adaptability')
+
+# Prepare data for feature importance calculation
+X = filtered_df.drop(columns=['Adaptabilidad'])
+y = filtered_df['Adaptabilidad']
+
+# One-hot encoding for categorical variables
+X = pd.get_dummies(X, drop_first=True)
+
+# Train a Random Forest model to determine feature importance
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X, y)
+
+# Get feature importances from the model
+feature_importances = model.feature_importances_
+
+# Create a DataFrame for feature importance
+importance_df = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': feature_importances
+}).sort_values(by='Importance', ascending=False)
+
+# Plot the top 15 most important features
+plt.figure(figsize=(10, 6))
+sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
+plt.title('Top 15 Important Features for Predicting Employee Adaptability')
+plt.xlabel('Importance')
+plt.ylabel('Feature')
+st.pyplot(plt)
+
+# Display the feature importance dataframe to the user
+tools.display_dataframe_to_user(name="Feature Importance for Employee Adaptability Model", dataframe=importance_df)
