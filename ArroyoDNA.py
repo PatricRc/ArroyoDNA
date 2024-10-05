@@ -244,7 +244,7 @@ elif page == "Chat with Survey Data":
                     st.info("Your Query: " + input_text)
 
                     # Initialize OpenAI LLM with model 'gpt-4-turbo'
-                    llm = OpenAI(api_token=api_key, model="gpt-3.5-turbo")
+                    llm = OpenAI(api_token=api_key, model="gpt-4-turbo")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
                     if isinstance(result, pd.DataFrame):
