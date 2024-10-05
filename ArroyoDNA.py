@@ -11,6 +11,7 @@ from pandasai.llm import OpenAI
 from pandasai.responses.response_parser import ResponseParser
 import os
 import yaml
+from pandasai.callbacks import StdoutCallback
 
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -275,9 +276,6 @@ elif page == "Survey Chatbot":
                     },
                 )
 
-                answer = query_engine.chat(query)
-        except Exception as e:
-            st.error(f"Error processing the file: {e}")
                 answer = query_engine.chat(query)
         except Exception as e:
             st.error(f"Error processing the file: {e}")
