@@ -8,10 +8,6 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
-from pandasai.responses.response_parser import ResponseParser
-import os
-import yaml
-from pandasai.callbacks import StdoutCallback
 
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -45,7 +41,7 @@ st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='w
 
 # Sidebar for page navigation
 st.sidebar.title('Navigation')
-page = st.sidebar.radio("Go to", ["Survey EDA", "Machine Learning Prediction", "Survey Chatbot"])
+page = st.sidebar.radio("Go to", ["Survey EDA", "Machine Learning Prediction", "Chat with Survey Data"])
 
 if page == "Survey EDA":
     st.title('📊 Employee Survey EDA')
@@ -211,16 +207,16 @@ elif page == "Machine Learning Prediction":
     st.title('🔮 Machine Learning Prediction')
     st.write("This section will contain machine learning models to predict employee outcomes based on survey data.")
 
-elif page == "Survey Chatbot":
-    st.title('💬 Survey Chatbot')
+elif page == "Chat with Survey Data":
+    st.title('💬 Chat with Survey Data')
 
     # File upload for survey data
     uploaded_file = st.file_uploader("Upload the survey Excel file", type=["xlsx"])
     if uploaded_file is not None:
         try:
-            df_chatbot = pd.read_excel(uploaded_file, engine='openpyxl')
-            existing_columns = df_chatbot.columns.tolist()
-            columns_to_keep_chatbot = [
+            df_chat = pd.read_excel(uploaded_file, engine='openpyxl')
+            existing_columns = df_chat.columns.tolist()
+            columns_to_keep_chat = [
                 'ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
                 'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
                 'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
@@ -228,54 +224,26 @@ elif page == "Survey Chatbot":
                 'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
                 'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
             ]
-            columns_to_keep_chatbot = [col for col in columns_to_keep_chatbot if col in existing_columns]
-            df_chatbot = df_chatbot[columns_to_keep_chatbot]
+            columns_to_keep_chat = [col for col in columns_to_keep_chat if col in existing_columns]
+            df_chat = df_chat[columns_to_keep_chat]
 
             st.write("Survey data loaded successfully.")
-            st.write(df_chatbot.head())
+            st.write(df_chat.head())
 
-            # Text input for OpenAI API Key
-            api_key = st.text_input("Enter your OpenAI API Key", type="password")
+            # Enter the query for analysis
+            st.info("Chat Below")
+            input_text = st.text_area("Enter the query")
 
-            # Chatbot functionality
-            query = st.text_area("🗣️ Ask a question about the survey data")
-            container = st.container()
+            # Perform analysis
+            if input_text:
+                if st.button("Chat with data"):
+                    st.info("Your Query: " + input_text)
 
-            if query and api_key:
-                class StreamlitCallback(StdoutCallback):
-                    def __init__(self, container) -> None:
-                        """Initialize callback handler."""
-                        self.container = container
+                    # Initialize OpenAI LLM with model 'gpt-4o-2024-08-06'
+                    llm = OpenAI(model="gpt-4o-2024-08-06")
+                    pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
+                    result = pandas_ai.chat(input_text)
+                    st.success(result)
 
-                    def on_code(self, response: str):
-                        self.container.code(response)
-
-                class StreamlitResponse(ResponseParser):
-                    def __init__(self, context) -> None:
-                        super().__init__(context)
-
-                    def format_dataframe(self, result):
-                        st.dataframe(result["value"])
-                        return
-
-                    def format_plot(self, result):
-                        st.image(result["value"])
-                        return
-
-                    def format_other(self, result):
-                        st.write(result["value"])
-                        return
-
-                llm = OpenAI(api_token=api_key)
-                query_engine = SmartDataframe(
-                    df_chatbot,
-                    config={
-                        "llm": llm,
-                        "response_parser": StreamlitResponse,
-                        "callback": StreamlitCallback(container),
-                    },
-                )
-
-                answer = query_engine.chat(query)
         except Exception as e:
             st.error(f"Error processing the file: {e}")
