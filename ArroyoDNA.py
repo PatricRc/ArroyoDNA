@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestRegressor
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
 from pandasai.responses.response_parser import ResponseParser
+from pandasai.callbacks import StdoutCallback
 import os
 import yaml
 
@@ -241,7 +242,7 @@ elif page == "Survey Chatbot":
             container = st.container()
 
             if query and api_key:
-                class StreamlitCallback(BaseCallback):
+                class StreamlitCallback(StdoutCallback):
                     def __init__(self, container) -> None:
                         """Initialize callback handler."""
                         self.container = container
