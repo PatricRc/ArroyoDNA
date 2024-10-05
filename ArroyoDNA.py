@@ -20,6 +20,17 @@ except ValueError as e:
     st.error(f"Error reading the Excel file: {e}")
     st.stop()
 
+# Select only the relevant columns
+columns_to_keep = [
+    'ID', 'Rol ', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
+    'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
+    'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+    'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
+    'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
+    'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
+]
+df = df[columns_to_keep]
+
 # Streamlit app setup
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
 st.title('📊 Employee Survey EDA')
@@ -55,7 +66,7 @@ st.write(filtered_df)
 
 # Summary statistics
 st.subheader('Summary Statistics')
-st.write(filtered_df.drop(columns=['ID', 'TOTAL']).describe())
+st.write(filtered_df.describe())
 
 # Correlation Heatmap for Numerical Features
 st.subheader('Correlation Heatmap for Numerical Features')
@@ -75,34 +86,34 @@ plt.figure(figsize=(8, 5))
 sns.countplot(data=filtered_df, x='Genero', palette='Set2')
 st.pyplot(plt)
 
-# Experience vs. Total Score
-st.subheader('Years of Experience vs. Total Score')
+# Experience vs. Nivel de inglés
+st.subheader('Years of Experience vs. Nivel de inglés')
 plt.figure(figsize=(10, 6))
-sns.scatterplot(data=filtered_df, x='Años de experiencia', y='TOTAL', hue='Genero', palette='Set1')
+sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
 st.pyplot(plt)
 
-# Boxplot of Total Scores by Role
-st.subheader('Boxplot of Total Scores by Role')
+# Boxplot of Nivel de inglés by Role
+st.subheader('Boxplot of Nivel de inglés by Role')
 plt.figure(figsize=(18, 8))
-sns.boxplot(data=filtered_df, x='Rol ', y='TOTAL', palette='Set3')
+sns.boxplot(data=filtered_df, x='Rol ', y='Nivel de inglés', palette='Set3')
 plt.xticks(rotation=90)
 st.pyplot(plt)
 
-# Total Score Distribution
-st.subheader('Distribution of Total Scores')
+# Distribution of Nivel de inglés
+st.subheader('Distribution of Nivel de inglés')
 plt.figure(figsize=(10, 6))
-sns.histplot(filtered_df['TOTAL'], kde=True, color='green')
+sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
 st.pyplot(plt)
 
-# Relationship between Age and Total Score
-st.subheader('Age vs. Total Score')
+# Relationship between Age and Nivel de inglés
+st.subheader('Age vs. Nivel de inglés')
 plt.figure(figsize=(10, 6))
-sns.regplot(data=filtered_df, x='Edad', y='TOTAL', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
+sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
 st.pyplot(plt)
 
 # Pairplot to observe relationships between select numerical features
 st.subheader('Pairplot of Selected Numerical Features')
-selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia']
+selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
 sns.pairplot(filtered_df[selected_features])
 st.pyplot(plt)
 
