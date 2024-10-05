@@ -235,3 +235,4 @@ plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 st.pyplot(plt)
+    
