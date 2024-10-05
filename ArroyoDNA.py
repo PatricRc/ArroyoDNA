@@ -247,7 +247,10 @@ elif page == "Chat with Survey Data":
                     llm = OpenAI(api_token=api_key, model="gpt-3.5-turbo")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
-                    st.success(result)
+                    if isinstance(result, pd.DataFrame):
+                        st.dataframe(result)
+                    else:
+                        st.success(result)
 
         except Exception as e:
             st.error(f"Error processing the file: {e}")
