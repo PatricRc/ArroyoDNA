@@ -279,6 +279,3 @@ elif page == "Survey Chatbot":
                 answer = query_engine.chat(query)
         except Exception as e:
             st.error(f"Error processing the file: {e}")
-                answer = query_engine.chat(query)
-        except Exception as e:
-            st.error(f"Error processing the file: {e}")
