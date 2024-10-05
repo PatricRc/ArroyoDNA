@@ -140,6 +140,7 @@ st.write(english_level_counts)
 
 with st.beta_expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
+    st.subheader('Correlation Heatmap for Numerical Features')
     
 st.subheader('Correlation Heatmap for Numerical Features')
 plt.figure(figsize=(10, 6))
@@ -234,4 +235,5 @@ plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 st.pyplot(plt)
+    
     
