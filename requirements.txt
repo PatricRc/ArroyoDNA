@@ -3,5 +3,8 @@ seaborn
 pandas
 numpy
 streamlit
-openpyxl
 requests
+scikit-learn
+openpyxl
+ace_tools
+
