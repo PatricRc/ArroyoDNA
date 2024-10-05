@@ -7,7 +7,7 @@ import io
 import requests
 
 # Load the dataset from the GitHub repository
-file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%201.xlsx'
+file_url = 'https://github.com/PatricRc/ArroyoDNA/raw/main/Human%20Skills%20Resultados%201.xlsx'
 try:
     response = requests.get(file_url)
     response.raise_for_status()  # Raise an error for bad status codes
