@@ -21,15 +21,17 @@ except ValueError as e:
     st.error(f"Error reading the Excel file: {e}")
     st.stop()
 
-# Select only the relevant columns
+# Ensure columns exist in the dataset before selecting
+existing_columns = df.columns.tolist()
 columns_to_keep = [
-    'ID', 'Rol ', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
+    'ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
     'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
     'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
     'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
     'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
     'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
 ]
+columns_to_keep = [col for col in columns_to_keep if col in existing_columns]
 df = df[columns_to_keep]
 
 # Streamlit app setup
@@ -39,8 +41,8 @@ st.title('📊 Employee Survey EDA')
 # Filters for DataFrame
 
 # Filters on the page
-top_20_roles = df.groupby('Rol ')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
-all_roles = df['Rol '].unique().tolist()
+top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
+all_roles = df['Rol'].unique().tolist()
 
 # Role filter for top 20 roles
 role_filter = st.multiselect('Select Role', options=all_roles, default=top_20_roles)
@@ -57,7 +59,7 @@ experience_filter = st.slider('Select Años de experiencia Range', int(df['Años
 
 # Filter DataFrame
 filtered_df = df[
-    (df['Rol '].isin(role_filter)) &
+    (df['Rol'].isin(role_filter)) &
     (df['País'].isin(country_filter)) &
     (df['Edad'] >= age_filter[0]) & (df['Edad'] <= age_filter[1]) &
     (df['Meses en Arroyo'] >= months_in_company_filter[0]) & (df['Meses en Arroyo'] <= months_in_company_filter[1]) &
@@ -77,7 +79,7 @@ with st.expander('Analytics Section'):
     st.subheader('Additional Analytics')
 
     # Top 10 By Roles
-    role_counts = df['Rol '].value_counts().head(10)
+    role_counts = df['Rol'].value_counts().head(10)
     st.write('Top 10 By Roles')
     st.write(role_counts)
 
@@ -166,8 +168,8 @@ with st.expander('Visualizations Section'):
     st.subheader('Feature Importance for Predicting Employee Adaptability')
     
     # Prepare data for feature importance calculation
-    excluded_columns = ['ID', 'Rol ', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-    X = filtered_df.drop(columns=excluded_columns + ['Adaptabilidad'])
+    excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
+    X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
     y = filtered_df['Adaptabilidad']
     
     # One-hot encoding for categorical variables
@@ -193,3 +195,4 @@ with st.expander('Visualizations Section'):
     plt.xlabel('Importance')
     plt.ylabel('Feature')
     st.pyplot(plt)
+
