@@ -24,13 +24,6 @@ except ValueError as e:
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
 st.title('📊 Employee Survey EDA')
 
-# Display basic information about the dataset
-st.subheader('Dataset Information')
-buf = io.StringIO()
-df.info(buf=buf)
-buf.seek(0)
-st.text(buf.read())
-
 # Summary statistics
 st.subheader('Summary Statistics')
 st.write(df.describe())
