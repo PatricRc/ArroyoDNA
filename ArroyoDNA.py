@@ -141,8 +141,6 @@ with st.expander('Analytics Section'):
 with st.expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
     st.subheader('Correlation Heatmap for Numerical Features')
-    
-    st.subheader('Correlation Heatmap for Numerical Features')
     plt.figure(figsize=(10, 6))
     sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
     st.pyplot(plt)
