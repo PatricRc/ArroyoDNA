@@ -1,6 +1,8 @@
 # Load the dataset from the GitHub repository
-file_path = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%201.xlsx'
-df = pd.read_excel(file_path, sheet_name='Sheet1')
+file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%201.xlsx'
+response = requests.get(file_url)
+file_data = io.BytesIO(response.content)
+df = pd.read_excel(file_data, sheet_name='Sheet1')
 
 # Streamlit app setup
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
