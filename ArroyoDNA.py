@@ -26,7 +26,7 @@ st.title('📊 Employee Survey EDA')
 
 # Summary statistics
 st.subheader('Summary Statistics')
-st.write(df.describe())
+st.write(df.drop(columns=['ID']).describe())
 
 # Correlation Heatmap for Numerical Features
 st.subheader('Correlation Heatmap for Numerical Features')
