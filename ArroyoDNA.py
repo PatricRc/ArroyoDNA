@@ -29,7 +29,7 @@ existing_columns = df.columns.tolist()
 columns_to_keep = [
     'ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
     'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
-    'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+    'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
     'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
     'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
     'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
@@ -220,7 +220,7 @@ elif page == "Chat with Survey Data":
             columns_to_keep_chat = [
                 'ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
                 'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
-                'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+                'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
                 'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
                 'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
                 'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
@@ -243,8 +243,8 @@ elif page == "Chat with Survey Data":
                 if st.button("Chat with data"):
                     st.info("Your Query: " + input_text)
 
-                    # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-                    llm = OpenAI(api_token=api_key, model="gpt-3.5-turbo")
+                    # Initialize OpenAI LLM with model 'gpt-4-turbo'
+                    llm = OpenAI(api_token=api_key, model="gpt-4-turbo")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
                     if isinstance(result, pd.DataFrame):
