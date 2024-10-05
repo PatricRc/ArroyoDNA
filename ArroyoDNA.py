@@ -6,7 +6,6 @@ import streamlit as st
 import io
 import requests
 from sklearn.ensemble import RandomForestRegressor
-import ace_tools as tools
 
 # Load the dataset from the GitHub repository
 file_url = 'https://github.com/PatricRc/ArroyoDNA/raw/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -97,13 +96,6 @@ plt.figure(figsize=(10, 6))
 sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
 st.pyplot(plt)
 
-# Boxplot of Nivel de inglés by Role
-st.subheader('Boxplot of Nivel de inglés by Role')
-plt.figure(figsize=(18, 8))
-sns.boxplot(data=filtered_df, x='Rol ', y='Nivel de inglés', palette='Set3')
-plt.xticks(rotation=90)
-st.pyplot(plt)
-
 # Distribution of Nivel de inglés
 st.subheader('Distribution of Nivel de inglés')
 plt.figure(figsize=(10, 6))
@@ -163,6 +155,3 @@ plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 st.pyplot(plt)
-
-# Display the feature importance dataframe to the user
-tools.display_dataframe_to_user(name="Feature Importance for Employee Adaptability Model", dataframe=importance_df)
