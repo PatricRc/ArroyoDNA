@@ -243,8 +243,8 @@ elif page == "Chat with Survey Data":
                 if st.button("Chat with data"):
                     st.info("Your Query: " + input_text)
 
-                    # Initialize OpenAI LLM with model 'gpt-4o-2024-08-06'
-                    llm = OpenAI(api_token=api_key, model="gpt-4o-2024-08-06")
+                    # Initialize OpenAI LLM with model 'o1-mini-2024-09-12'
+                    llm = OpenAI(api_token=api_key, model="o1-mini-2024-09-12")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
                     st.success(result)
