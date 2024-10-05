@@ -105,38 +105,38 @@ with st.expander('Tables Section'):
     st.write('Breakdown by Nivel de Inglés')
     st.write(english_level_counts)
 
-# Additional Analytics
-st.subheader('Additional Analytics')
-
-# Top 10 By Roles
-role_counts = df['Rol '].value_counts().head(10)
-st.write('Top 10 By Roles')
-st.write(role_counts)
-
-# Gender Breakdown
-gender_counts = df['Genero'].value_counts()
-st.write('Gender Breakdown')
-st.write(gender_counts)
-
-# Top 10 by Age
-age_counts = df['Edad'].value_counts().head(10)
-st.write('Top 10 by Age')
-st.write(age_counts)
-
-# Breakdown by Country
-country_counts = df['País'].value_counts()
-st.write('Breakdown by Country')
-st.write(country_counts)
-
-# Top 10 by Years of Experience
-experience_counts = df['Años de experiencia'].value_counts().head(10)
-st.write('Top 10 by Years of Experience')
-st.write(experience_counts)
-
-# Breakdown by Nivel de Inglés
-english_level_counts = df['Nivel de inglés'].value_counts()
-st.write('Breakdown by Nivel de Inglés')
-st.write(english_level_counts)
+    # Additional Analytics
+    st.subheader('Additional Analytics')
+    
+    # Top 10 By Roles
+    role_counts = df['Rol '].value_counts().head(10)
+    st.write('Top 10 By Roles')
+    st.write(role_counts)
+    
+    # Gender Breakdown
+    gender_counts = df['Genero'].value_counts()
+    st.write('Gender Breakdown')
+    st.write(gender_counts)
+    
+    # Top 10 by Age
+    age_counts = df['Edad'].value_counts().head(10)
+    st.write('Top 10 by Age')
+    st.write(age_counts)
+    
+    # Breakdown by Country
+    country_counts = df['País'].value_counts()
+    st.write('Breakdown by Country')
+    st.write(country_counts)
+    
+    # Top 10 by Years of Experience
+    experience_counts = df['Años de experiencia'].value_counts().head(10)
+    st.write('Top 10 by Years of Experience')
+    st.write(experience_counts)
+    
+    # Breakdown by Nivel de Inglés
+    english_level_counts = df['Nivel de inglés'].value_counts()
+    st.write('Breakdown by Nivel de Inglés')
+    st.write(english_level_counts)
 
 with st.expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
