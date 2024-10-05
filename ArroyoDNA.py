@@ -68,7 +68,7 @@ st.subheader('Filtered Dataset')
 st.write(filtered_df)
 
 # Summary statistics
-with st.beta_expander('Tables Section'):
+with st.expander('Tables Section'):
     st.subheader('Summary Statistics')
     st.write(filtered_df.describe())
 
@@ -235,5 +235,3 @@ plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 st.pyplot(plt)
-    
-    
