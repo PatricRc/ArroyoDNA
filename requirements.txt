@@ -5,4 +5,5 @@ numpy
 streamlit
 openpyxl
 scikit-learn
+pandasai
 requests
