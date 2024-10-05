@@ -138,7 +138,7 @@ english_level_counts = df['Nivel de inglés'].value_counts()
 st.write('Breakdown by Nivel de Inglés')
 st.write(english_level_counts)
 
-with st.beta_expander('Visualizations Section'):
+with st.expander('Visualizations Section'):
     # Correlation Heatmap for Numerical Features
     st.subheader('Correlation Heatmap for Numerical Features')
     
@@ -235,4 +235,5 @@ plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
 plt.ylabel('Feature')
 st.pyplot(plt)
+    
     
