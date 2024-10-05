@@ -36,170 +36,176 @@ df = df[columns_to_keep]
 
 # Streamlit app setup
 st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
-st.title('📊 Employee Survey EDA')
 
-# Sidebar sections
-st.sidebar.title('Survey EDA')
+# Sidebar for page navigation
+st.sidebar.title('Navigation')
+page = st.sidebar.radio("Go to", ["Survey EDA", "Machine Learning Prediction", "Survey Chatbot"])
 
-# Filters for DataFrame
-# Filters on the page
-top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
-all_roles = df['Rol'].unique().tolist()
+if page == "Survey EDA":
+    st.title('📊 Employee Survey EDA')
 
-# Role filter for top 20 roles
-role_filter = st.multiselect('Select Role', options=all_roles, default=top_20_roles)
+    # Filters for DataFrame
+    # Filters on the page
+    top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
+    all_roles = df['Rol'].unique().tolist()
 
-# Country filter
-country_filter = st.multiselect('Select Country', options=df['País'].unique(), default=df['País'].unique())
+    # Role filter for top 20 roles
+    role_filter = st.multiselect('Select Role', options=all_roles, default=top_20_roles)
 
-# Age filter
-age_filter = st.slider('Select Age Range', int(df['Edad'].min()), int(df['Edad'].max()), (int(df['Edad'].min()), int(df['Edad'].max())))
+    # Country filter
+    country_filter = st.multiselect('Select Country', options=df['País'].unique(), default=df['País'].unique())
 
-# Numeric slicers
-months_in_company_filter = st.slider('Select Meses en Arroyo Range', int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max()), (int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max())))
-experience_filter = st.slider('Select Años de experiencia Range', int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max()), (int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max())))
+    # Age filter
+    age_filter = st.slider('Select Age Range', int(df['Edad'].min()), int(df['Edad'].max()), (int(df['Edad'].min()), int(df['Edad'].max())))
 
-# Filter DataFrame
-filtered_df = df[
-    (df['Rol'].isin(role_filter)) &
-    (df['País'].isin(country_filter)) &
-    (df['Edad'] >= age_filter[0]) & (df['Edad'] <= age_filter[1]) &
-    (df['Meses en Arroyo'] >= months_in_company_filter[0]) & (df['Meses en Arroyo'] <= months_in_company_filter[1]) &
-    (df['Años de experiencia'] >= experience_filter[0]) & (df['Años de experiencia'] <= experience_filter[1])
-]
+    # Numeric slicers
+    months_in_company_filter = st.slider('Select Meses en Arroyo Range', int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max()), (int(df['Meses en Arroyo'].min()), int(df['Meses en Arroyo'].max())))
+    experience_filter = st.slider('Select Años de experiencia Range', int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max()), (int(df['Años de experiencia'].min()), int(df['Años de experiencia'].max())))
 
-# Display filtered DataFrame
-st.subheader('Filtered Dataset')
-st.write(filtered_df)
+    # Filter DataFrame
+    filtered_df = df[
+        (df['Rol'].isin(role_filter)) &
+        (df['País'].isin(country_filter)) &
+        (df['Edad'] >= age_filter[0]) & (df['Edad'] <= age_filter[1]) &
+        (df['Meses en Arroyo'] >= months_in_company_filter[0]) & (df['Meses en Arroyo'] <= months_in_company_filter[1]) &
+        (df['Años de experiencia'] >= experience_filter[0]) & (df['Años de experiencia'] <= experience_filter[1])
+    ]
 
-# Summary statistics
-with st.expander('Analytics Section'):
-    st.subheader('Summary Statistics')
-    st.write(df.describe())
+    # Display filtered DataFrame
+    st.subheader('Filtered Dataset')
+    st.write(filtered_df)
 
-    # Additional Analytics
-    st.subheader('Additional Analytics')
+    # Summary statistics
+    with st.expander('Analytics Section'):
+        st.subheader('Summary Statistics')
+        st.write(df.describe())
 
-    # Top 10 By Roles
-    role_counts = df['Rol'].value_counts().head(10)
-    st.write('Top 10 By Roles')
-    st.write(role_counts)
+        # Additional Analytics
+        st.subheader('Additional Analytics')
 
-    # Gender Breakdown
-    gender_counts = df['Genero'].value_counts()
-    st.write('Gender Breakdown')
-    st.write(gender_counts)
+        # Top 10 By Roles
+        role_counts = df['Rol'].value_counts().head(10)
+        st.write('Top 10 By Roles')
+        st.write(role_counts)
 
-    # Top 10 by Age
-    age_counts = df['Edad'].value_counts().head(10)
-    st.write('Top 10 by Age')
-    st.write(age_counts)
+        # Gender Breakdown
+        gender_counts = df['Genero'].value_counts()
+        st.write('Gender Breakdown')
+        st.write(gender_counts)
 
-    # Breakdown by Country
-    country_counts = df['País'].value_counts()
-    st.write('Breakdown by Country')
-    st.write(country_counts)
+        # Top 10 by Age
+        age_counts = df['Edad'].value_counts().head(10)
+        st.write('Top 10 by Age')
+        st.write(age_counts)
 
-    # Top 10 by Years of Experience
-    experience_counts = df['Años de experiencia'].value_counts().head(10)
-    st.write('Top 10 by Years of Experience')
-    st.write(experience_counts)
+        # Breakdown by Country
+        country_counts = df['País'].value_counts()
+        st.write('Breakdown by Country')
+        st.write(country_counts)
 
-    # Breakdown by Nivel de Inglés
-    english_level_counts = df['Nivel de inglés'].value_counts()
-    st.write('Breakdown by Nivel de Inglés')
-    st.write(english_level_counts)
+        # Top 10 by Years of Experience
+        experience_counts = df['Años de experiencia'].value_counts().head(10)
+        st.write('Top 10 by Years of Experience')
+        st.write(experience_counts)
 
-with st.expander('Visualizations Section'):
-    # Correlation Heatmap for Numerical Features
-    st.subheader('Correlation Heatmap for Numerical Features')
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
-    st.pyplot(plt)
+        # Breakdown by Nivel de Inglés
+        english_level_counts = df['Nivel de inglés'].value_counts()
+        st.write('Breakdown by Nivel de Inglés')
+        st.write(english_level_counts)
+
+    with st.expander('Visualizations Section'):
+        # Correlation Heatmap for Numerical Features
+        st.subheader('Correlation Heatmap for Numerical Features')
+        plt.figure(figsize=(10, 6))
+        sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
+        st.pyplot(plt)
+            
+        # Distribution of Age
+        st.subheader('Distribution of Age')
+        plt.figure(figsize=(10, 6))
+        sns.histplot(filtered_df['Edad'], kde=True, color='blue')
+        st.pyplot(plt)
+            
+        # Gender Countplot
+        st.subheader('Gender Distribution')
+        plt.figure(figsize=(10, 6))
+        sns.countplot(data=filtered_df, x='Genero', palette='Set2')
+        st.pyplot(plt)
+            
+        # Experience vs. Nivel de inglés
+        st.subheader('Years of Experience vs. Nivel de inglés')
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
+        st.pyplot(plt)
+            
+        # Distribution of Nivel de inglés
+        st.subheader('Distribution of Nivel de inglés')
+        plt.figure(figsize=(10, 6))
+        sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
+        st.pyplot(plt)    
+
+        # Relationship between Age and Nivel de inglés
+        st.subheader('Age vs. Nivel de inglés')
+        filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
+        filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
+        plt.figure(figsize=(10, 6))
+        sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
+        st.pyplot(plt)
+            
+        # Pairplot to observe relationships between select numerical features
+        st.subheader('Pairplot of Selected Numerical Features')
+        selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
+        sns.pairplot(filtered_df[selected_features], height=4)
+        st.pyplot(plt)
+            
+        # Summary of categorical features
+        st.subheader('Summary of Categorical Features')
+        st.write(filtered_df.describe(include=['object']))
         
-    # Distribution of Age
-    st.subheader('Distribution of Age')
-    plt.figure(figsize=(10, 6))
-    sns.histplot(filtered_df['Edad'], kde=True, color='blue')
-    st.pyplot(plt)
+        # Countplot of Country
+        st.subheader('Country Distribution')
+        plt.figure(figsize=(10, 6))
+        sns.countplot(data=filtered_df, x='País', palette='viridis')
+        plt.xticks(rotation=45)
+        st.pyplot(plt)
+            
+        # Feature Importance Section
+        st.subheader('Feature Importance for Predicting Employee Adaptability')
         
-    # Gender Countplot
-    st.subheader('Gender Distribution')
-    plt.figure(figsize=(10, 6))
-    sns.countplot(data=filtered_df, x='Genero', palette='Set2')
-    st.pyplot(plt)
+        # Prepare data for feature importance calculation
+        excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
+        X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
+        y = filtered_df['Adaptabilidad']
         
-    # Experience vs. Nivel de inglés
-    st.subheader('Years of Experience vs. Nivel de inglés')
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
-    st.pyplot(plt)
+        # One-hot encoding for categorical variables
+        X = pd.get_dummies(X, drop_first=True)
         
-    # Distribution of Nivel de inglés
-    st.subheader('Distribution of Nivel de inglés')
-    plt.figure(figsize=(10, 6))
-    sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
-    st.pyplot(plt)    
+        # Train a Random Forest model to determine feature importance
+        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        model.fit(X, y)
+        
+        # Get feature importances from the model
+        feature_importances = model.feature_importances_
+        
+        # Create a DataFrame for feature importance
+        importance_df = pd.DataFrame({
+            'Feature': X.columns,
+            'Importance': feature_importances
+        }).sort_values(by='Importance', ascending=False)
+        
+        # Plot the top 15 most important features
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
+        plt.title('Top 15 Important Features for Predicting Employee Adaptability')
+        plt.xlabel('Importance')
+        plt.ylabel('Feature')
+        st.pyplot(plt)
 
-    # Relationship between Age and Nivel de inglés
-    st.subheader('Age vs. Nivel de inglés')
-    filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
-    filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
-    plt.figure(figsize=(10, 6))
-    sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
-    st.pyplot(plt)
-        
-    # Pairplot to observe relationships between select numerical features
-    st.subheader('Pairplot of Selected Numerical Features')
-    selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-    sns.pairplot(filtered_df[selected_features], height=4)
-    st.pyplot(plt)
-        
-    # Summary of categorical features
-    st.subheader('Summary of Categorical Features')
-    st.write(filtered_df.describe(include=['object']))
-    
-    # Countplot of Country
-    st.subheader('Country Distribution')
-    plt.figure(figsize=(10, 6))
-    sns.countplot(data=filtered_df, x='País', palette='viridis')
-    plt.xticks(rotation=45)
-    st.pyplot(plt)
-        
-    # Feature Importance Section
-    st.subheader('Feature Importance for Predicting Employee Adaptability')
-    
-    # Prepare data for feature importance calculation
-    excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-    X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
-    y = filtered_df['Adaptabilidad']
-    
-    # One-hot encoding for categorical variables
-    X = pd.get_dummies(X, drop_first=True)
-    
-    # Train a Random Forest model to determine feature importance
-    model = RandomForestRegressor(n_estimators=100, random_state=42)
-    model.fit(X, y)
-    
-    # Get feature importances from the model
-    feature_importances = model.feature_importances_
-    
-    # Create a DataFrame for feature importance
-    importance_df = pd.DataFrame({
-        'Feature': X.columns,
-        'Importance': feature_importances
-    }).sort_values(by='Importance', ascending=False)
-    
-    # Plot the top 15 most important features
-    plt.figure(figsize=(10, 6))
-    sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
-    plt.title('Top 15 Important Features for Predicting Employee Adaptability')
-    plt.xlabel('Importance')
-    plt.ylabel('Feature')
-    st.pyplot(plt)
+elif page == "Machine Learning Prediction":
+    st.title('🔮 Machine Learning Prediction')
+    st.write("This section will contain machine learning models to predict employee outcomes based on survey data.")
 
-# Sidebar sections
-st.sidebar.title('Machine Learning Prediction')
-st.sidebar.title('Survey Chatbot')
-
+elif page == "Survey Chatbot":
+    st.title('💬 Survey Chatbot')
+    st.write("This section will contain a chatbot to answer questions about the survey data.")
 
