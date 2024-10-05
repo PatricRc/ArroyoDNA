@@ -6,6 +6,11 @@ import streamlit as st
 import io
 import requests
 from sklearn.ensemble import RandomForestRegressor
+from pandasai import SmartDataframe
+from pandasai.callbacks import BaseCallback
+from pandasai.llm import OpenAI
+from pandasai.responses.response_parser import ResponseParser
+import os
 
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -116,31 +121,31 @@ if page == "Survey EDA":
     with st.expander('Visualizations Section'):
         # Correlation Heatmap for Numerical Features
         st.subheader('Correlation Heatmap for Numerical Features')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
         st.pyplot(plt)
             
         # Distribution of Age
         st.subheader('Distribution of Age')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Edad'], kde=True, color='blue')
         st.pyplot(plt)
             
         # Gender Countplot
         st.subheader('Gender Distribution')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='Genero', palette='Set2')
         st.pyplot(plt)
             
         # Experience vs. Nivel de inglés
         st.subheader('Years of Experience vs. Nivel de inglés')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
         st.pyplot(plt)
             
         # Distribution of Nivel de inglés
         st.subheader('Distribution of Nivel de inglés')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
         st.pyplot(plt)    
 
@@ -148,7 +153,7 @@ if page == "Survey EDA":
         st.subheader('Age vs. Nivel de inglés')
         filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
         filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
         st.pyplot(plt)
             
@@ -164,7 +169,7 @@ if page == "Survey EDA":
         
         # Countplot of Country
         st.subheader('Country Distribution')
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='País', palette='viridis')
         plt.xticks(rotation=45)
         st.pyplot(plt)
@@ -194,7 +199,7 @@ if page == "Survey EDA":
         }).sort_values(by='Importance', ascending=False)
         
         # Plot the top 15 most important features
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(5, 3))
         sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
         plt.title('Top 15 Important Features for Predicting Employee Adaptability')
         plt.xlabel('Importance')
@@ -207,5 +212,69 @@ elif page == "Machine Learning Prediction":
 
 elif page == "Survey Chatbot":
     st.title('💬 Survey Chatbot')
-    st.write("This section will contain a chatbot to answer questions about the survey data.")
 
+    # File upload for survey data
+    uploaded_file = st.file_uploader("Upload the survey Excel file", type=["xlsx"])
+    if uploaded_file is not None:
+        try:
+            df_chatbot = pd.read_excel(uploaded_file, engine='openpyxl')
+            existing_columns = df_chatbot.columns.tolist()
+            columns_to_keep_chatbot = [
+                'ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
+                'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
+                'Pensamiento análitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+                'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
+                'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
+                'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
+            ]
+            columns_to_keep_chatbot = [col for col in columns_to_keep_chatbot if col in existing_columns]
+            df_chatbot = df_chatbot[columns_to_keep_chatbot]
+
+            st.write("Survey data loaded successfully.")
+            st.write(df_chatbot.head())
+
+            # Text input for OpenAI API Key
+            api_key = st.text_input("Enter your OpenAI API Key", type="password")
+
+            # Chatbot functionality
+            query = st.text_area("🗣️ Ask a question about the survey data")
+            container = st.container()
+
+            if query and api_key:
+                class StreamlitCallback(BaseCallback):
+                    def __init__(self, container) -> None:
+                        """Initialize callback handler."""
+                        self.container = container
+
+                    def on_code(self, response: str):
+                        self.container.code(response)
+
+                class StreamlitResponse(ResponseParser):
+                    def __init__(self, context) -> None:
+                        super().__init__(context)
+
+                    def format_dataframe(self, result):
+                        st.dataframe(result["value"])
+                        return
+
+                    def format_plot(self, result):
+                        st.image(result["value"])
+                        return
+
+                    def format_other(self, result):
+                        st.write(result["value"])
+                        return
+
+                llm = OpenAI(api_token=api_key)
+                query_engine = SmartDataframe(
+                    df_chatbot,
+                    config={
+                        "llm": llm,
+                        "response_parser": StreamlitResponse,
+                        "callback": StreamlitCallback(container),
+                    },
+                )
+
+                answer = query_engine.chat(query)
+        except Exception as e:
+            st.error(f"Error processing the file: {e}")
