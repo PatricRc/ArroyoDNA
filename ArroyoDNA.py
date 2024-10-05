@@ -8,7 +8,7 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 
 # Load the dataset from the GitHub repository
-file_url = 'https://github.com/PatricRc/ArroyoDNA/raw/main/Human%20Skills%20Resultados%20%201.xlsx'
+file_url = 'https://github.com/PatricRc/ArroyoDNA/blob/main/Human%20Skills%20Resultados%20%201.xlsx'
 try:
     response = requests.get(file_url)
     response.raise_for_status()  # Raise an error for bad status codes
