@@ -8,4 +8,14 @@ scikit-learn
 openpyxl
 ace_tools
 pandasai==1.4.10
+matplotlib==3.5.1
+seaborn==0.11.2
+pandas==1.4.2
+numpy==1.22.3
+streamlit==1.8.1
+requests==2.27.1
+openpyxl==3.0.9
+scikit-learn==1.0.2
+pandasai==0.1.1
+
 
