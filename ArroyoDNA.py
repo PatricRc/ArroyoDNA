@@ -104,6 +104,8 @@ st.pyplot(plt)
 
 # Relationship between Age and Nivel de inglés
 st.subheader('Age vs. Nivel de inglés')
+filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
+filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
 plt.figure(figsize=(10, 6))
 sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
 st.pyplot(plt)
