@@ -8,6 +8,7 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 from pandasai import SmartDataframe
 from pandasai.llm import OpenAI
+import os
 
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -230,17 +231,20 @@ elif page == "Chat with Survey Data":
             st.write("Survey data loaded successfully.")
             st.write(df_chat.head())
 
+            # Text input for OpenAI API Key
+            api_key = st.text_input("Enter your OpenAI API Key", type="password")
+
             # Enter the query for analysis
             st.info("Chat Below")
             input_text = st.text_area("Enter the query")
 
             # Perform analysis
-            if input_text:
+            if input_text and api_key:
                 if st.button("Chat with data"):
                     st.info("Your Query: " + input_text)
 
                     # Initialize OpenAI LLM with model 'gpt-4o-2024-08-06'
-                    llm = OpenAI(model="gpt-4o-2024-08-06")
+                    llm = OpenAI(api_token=api_key, model="gpt-4o-2024-08-06")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
                     st.success(result)
