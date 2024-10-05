@@ -74,31 +74,31 @@ st.write(filtered_df.describe())
 
 # Correlation Heatmap for Numerical Features
 st.subheader('Correlation Heatmap for Numerical Features')
-plt.figure(figsize=(16, 12))
+plt.figure(figsize=(int(16 * 0.6), int(12 * 0.6)))
 sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
 st.pyplot(plt)
 
 # Distribution of Age
 st.subheader('Distribution of Age')
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(int(10 * 0.6), int(6 * 0.6)))
 sns.histplot(filtered_df['Edad'], kde=True, color='blue')
 st.pyplot(plt)
 
 # Gender Countplot
 st.subheader('Gender Distribution')
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(int(8 * 0.6), int(5 * 0.6)))
 sns.countplot(data=filtered_df, x='Genero', palette='Set2')
 st.pyplot(plt)
 
 # Experience vs. Nivel de inglés
 st.subheader('Years of Experience vs. Nivel de inglés')
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(int(10 * 0.6), int(6 * 0.6)))
 sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
 st.pyplot(plt)
 
 # Distribution of Nivel de inglés
 st.subheader('Distribution of Nivel de inglés')
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(int(10 * 0.6), int(6 * 0.6)))
 sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
 st.pyplot(plt)
 
@@ -106,14 +106,14 @@ st.pyplot(plt)
 st.subheader('Age vs. Nivel de inglés')
 filtered_df['Edad'] = pd.to_numeric(filtered_df['Edad'], errors='coerce')
 filtered_df['Nivel de inglés'] = pd.to_numeric(filtered_df['Nivel de inglés'], errors='coerce')
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(int(10 * 0.6), int(6 * 0.6)))
 sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
 st.pyplot(plt)
 
 # Pairplot to observe relationships between select numerical features
 st.subheader('Pairplot of Selected Numerical Features')
 selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-sns.pairplot(filtered_df[selected_features])
+sns.pairplot(filtered_df[selected_features], height=2.4)
 st.pyplot(plt)
 
 # Summary of categorical features
@@ -122,7 +122,7 @@ st.write(filtered_df.describe(include=['object']))
 
 # Countplot of Country
 st.subheader('Country Distribution')
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(int(12 * 0.6), int(6 * 0.6)))
 sns.countplot(data=filtered_df, x='País', palette='viridis')
 plt.xticks(rotation=45)
 st.pyplot(plt)
@@ -131,7 +131,8 @@ st.pyplot(plt)
 st.subheader('Feature Importance for Predicting Employee Adaptability')
 
 # Prepare data for feature importance calculation
-X = filtered_df.drop(columns=['Adaptabilidad'])
+excluded_columns = ['ID', 'Rol ', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
+X = filtered_df.drop(columns=excluded_columns + ['Adaptabilidad'])
 y = filtered_df['Adaptabilidad']
 
 # One-hot encoding for categorical variables
@@ -151,7 +152,7 @@ importance_df = pd.DataFrame({
 }).sort_values(by='Importance', ascending=False)
 
 # Plot the top 15 most important features
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(int(10 * 0.6), int(6 * 0.6)))
 sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
 plt.title('Top 15 Important Features for Predicting Employee Adaptability')
 plt.xlabel('Importance')
