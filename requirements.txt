@@ -7,4 +7,5 @@ requests
 scikit-learn
 openpyxl
 ace_tools
+pandasai==1.4.10
 
