@@ -38,14 +38,14 @@ columns_to_keep = [col for col in columns_to_keep if col in existing_columns]
 df = df[columns_to_keep]
 
 # Streamlit app setup
-st.set_page_config(page_title='Employee Survey EDA', page_icon='📊', layout='wide')
+st.set_page_config(page_title='Employee Survey EDA', page_icon='📈', layout='wide')
 
 # Sidebar for page navigation
 st.sidebar.title('Navigation')
 page = st.sidebar.radio("Go to", ["Survey EDA", "Machine Learning Prediction", "Chat with Survey Data"])
 
 if page == "Survey EDA":
-    st.title('📊 Employee Survey EDA')
+    st.title('📈 Employee Survey EDA')
 
     # Filters for DataFrame
     # Filters on the page
@@ -205,7 +205,7 @@ if page == "Survey EDA":
         st.pyplot(plt)
 
 elif page == "Machine Learning Prediction":
-    st.title('🔮 Machine Learning Prediction')
+    st.title('🤖 Machine Learning Prediction')
     st.write("This section will contain machine learning models to predict employee outcomes based on survey data.")
 
 elif page == "Chat with Survey Data":
@@ -243,8 +243,8 @@ elif page == "Chat with Survey Data":
                 if st.button("Chat with data"):
                     st.info("Your Query: " + input_text)
 
-                    # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-                    llm = OpenAI(api_token=api_key, model="gpt-3.5-turbo")
+                    # Initialize OpenAI LLM with model 'gpt-4-turbo'
+                    llm = OpenAI(api_token=api_key, model="gpt-4-turbo")
                     pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
                     result = pandas_ai.chat(input_text)
                     if isinstance(result, pd.DataFrame):
