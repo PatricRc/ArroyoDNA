@@ -55,7 +55,6 @@ if page == "Survey EDA":
     st.title('📈 Employee Survey EDA')
 
     # Filters for DataFrame
-    # Filters on the page
     top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
     all_roles = df['Rol'].unique().tolist()
 
@@ -129,30 +128,30 @@ if page == "Survey EDA":
         plt.figure(figsize=(5, 3))
         sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
         st.pyplot(plt)
-            
+
         # Distribution of Age
         st.subheader('Distribution of Age')
         plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Edad'], kde=True, color='blue')
         st.pyplot(plt)
-            
+
         # Gender Countplot
         st.subheader('Gender Distribution')
         plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='Genero', palette='Set2')
         st.pyplot(plt)
-            
+
         # Experience vs. Nivel de inglés
         st.subheader('Years of Experience vs. Nivel de inglés')
         plt.figure(figsize=(5, 3))
         sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
         st.pyplot(plt)
-            
+
         # Distribution of Nivel de inglés
         st.subheader('Distribution of Nivel de inglés')
         plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
-        st.pyplot(plt)    
+        st.pyplot(plt)
 
         # Relationship between Age and Nivel de inglés
         st.subheader('Age vs. Nivel de inglés')
@@ -161,48 +160,48 @@ if page == "Survey EDA":
         plt.figure(figsize=(5, 3))
         sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
         st.pyplot(plt)
-            
+
         # Pairplot to observe relationships between select numerical features
         st.subheader('Pairplot of Selected Numerical Features')
         selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
         sns.pairplot(filtered_df[selected_features], height=4)
         st.pyplot(plt)
-            
+
         # Summary of categorical features
         st.subheader('Summary of Categorical Features')
         st.write(filtered_df.describe(include=['object']))
-        
+
         # Countplot of Country
         st.subheader('Country Distribution')
         plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='País', palette='viridis')
         plt.xticks(rotation=45)
         st.pyplot(plt)
-            
+
         # Feature Importance Section
         st.subheader('Feature Importance for Predicting Employee Adaptability')
-        
+
         # Prepare data for feature importance calculation
         excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
         X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
         y = filtered_df['Adaptabilidad']
-        
+
         # One-hot encoding for categorical variables
         X = pd.get_dummies(X, drop_first=True)
-        
+
         # Train a Random Forest model to determine feature importance
         model = RandomForestRegressor(n_estimators=100, random_state=42)
         model.fit(X, y)
-        
+
         # Get feature importances from the model
         feature_importances = model.feature_importances_
-        
+
         # Create a DataFrame for feature importance
         importance_df = pd.DataFrame({
             'Feature': X.columns,
             'Importance': feature_importances
         }).sort_values(by='Importance', ascending=False)
-        
+
         # Plot the top 15 most important features
         plt.figure(figsize=(5, 3))
         sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
@@ -291,7 +290,7 @@ def chat_with_data(df_chat, input_text, api_key):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key=api_key)
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
 
         # Generate response
         response = llm.predict(message)
