@@ -13,6 +13,71 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import ConversationalRetrievalChain
 
+@st.cache_data
+def load_data(uploaded_file):
+    """Load data from the uploaded file."""
+    try:
+        # Load based on file type
+        if uploaded_file.name.endswith("xlsx"):
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        elif uploaded_file.name.endswith("csv"):
+            df = pd.read_csv(uploaded_file)
+        else:
+            st.error("Unsupported file type.")
+            return None
+
+        # Columns to keep
+        columns_to_keep = [
+            'ID', 'Roles', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
+            'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
+            'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+            'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
+            'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
+            'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
+        ]
+        columns_to_keep = [col for col in columns_to_keep if col in df.columns]
+        df = df[columns_to_keep]
+
+        # Convert 'Roles' column to string if it exists
+        if 'Roles' in df.columns:
+            df['Roles'] = df['Roles'].astype(str)
+
+        return df
+
+    except Exception as e:
+        st.error(f"Error processing the file: {e}")
+        return None
+
+def chat_with_data(df_chat, input_text, api_key):
+    """Chat with the survey data using OpenAI."""
+    try:
+        # Convert DataFrame to a format suitable for context
+        context = df_chat.to_string(index=False)
+
+        # Create a prompt template
+        message = f"""
+        Answer the following question using the context provided:
+
+        Context:
+        {context}
+
+        Question:
+        {input_text}
+
+        Answer:
+        """
+
+        # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
+
+        # Generate response
+        response = llm.predict(message)
+
+        st.write(response)
+
+    except Exception as e:
+        st.error(f"Error during chat: {e}")
+
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
 try:
@@ -237,71 +302,6 @@ elif page == "Chat with Survey Data":
             # Perform analysis
             if input_text and api_key and st.button("Chat with data"):
                 chat_with_data(df_chat, input_text, api_key)
-
-@st.cache_data
-def load_data(uploaded_file):
-    """Load data from the uploaded file."""
-    try:
-        # Load based on file type
-        if uploaded_file.name.endswith("xlsx"):
-            df = pd.read_excel(uploaded_file, engine='openpyxl')
-        elif uploaded_file.name.endswith("csv"):
-            df = pd.read_csv(uploaded_file)
-        else:
-            st.error("Unsupported file type.")
-            return None
-
-        # Columns to keep
-        columns_to_keep = [
-            'ID', 'Roles', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
-            'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
-            'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
-            'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
-            'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
-            'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
-        ]
-        columns_to_keep = [col for col in columns_to_keep if col in df.columns]
-        df = df[columns_to_keep]
-
-        # Convert 'Roles' column to string if it exists
-        if 'Roles' in df.columns:
-            df['Roles'] = df['Roles'].astype(str)
-
-        return df
-
-    except Exception as e:
-        st.error(f"Error processing the file: {e}")
-        return None
-
-def chat_with_data(df_chat, input_text, api_key):
-    """Chat with the survey data using OpenAI."""
-    try:
-        # Convert DataFrame to a format suitable for context
-        context = df_chat.to_string(index=False)
-
-        # Create a prompt template
-        message = f"""
-        Answer the following question using the context provided:
-
-        Context:
-        {context}
-
-        Question:
-        {input_text}
-
-        Answer:
-        """
-
-        # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key=api_key)
-
-        # Generate response
-        response = llm.predict(message)
-
-        st.write(response)
-
-    except Exception as e:
-        st.error(f"Error during chat: {e}")
 
 if __name__ == "__main__":
     st.sidebar.write("Please select a page from the navigation sidebar.")
