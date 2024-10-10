@@ -183,32 +183,35 @@ if page == "Survey EDA":
 
         # Prepare data for feature importance calculation
         excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-        X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
-        y = filtered_df['Adaptabilidad']
+        if 'Adaptabilidad' in filtered_df.columns:
+            X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
+            y = filtered_df['Adaptabilidad']
 
-        # One-hot encoding for categorical variables
-        X = pd.get_dummies(X, drop_first=True)
+            # One-hot encoding for categorical variables
+            X = pd.get_dummies(X, drop_first=True)
 
-        # Train a Random Forest model to determine feature importance
-        model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X, y)
+            # Train a Random Forest model to determine feature importance
+            model = RandomForestRegressor(n_estimators=100, random_state=42)
+            model.fit(X, y)
 
-        # Get feature importances from the model
-        feature_importances = model.feature_importances_
+            # Get feature importances from the model
+            feature_importances = model.feature_importances_
 
-        # Create a DataFrame for feature importance
-        importance_df = pd.DataFrame({
-            'Feature': X.columns,
-            'Importance': feature_importances
-        }).sort_values(by='Importance', ascending=False)
+            # Create a DataFrame for feature importance
+            importance_df = pd.DataFrame({
+                'Feature': X.columns,
+                'Importance': feature_importances
+            }).sort_values(by='Importance', ascending=False)
 
-        # Plot the top 15 most important features
-        plt.figure(figsize=(5, 3))
-        sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
-        plt.title('Top 15 Important Features for Predicting Employee Adaptability')
-        plt.xlabel('Importance')
-        plt.ylabel('Feature')
-        st.pyplot(plt)
+            # Plot the top 15 most important features
+            plt.figure(figsize=(5, 3))
+            sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
+            plt.title('Top 15 Important Features for Predicting Employee Adaptability')
+            plt.xlabel('Importance')
+            plt.ylabel('Feature')
+            st.pyplot(plt)
+        else:
+            st.write("The column 'Adaptabilidad' is not present in the dataset for feature importance calculation.")
 
 elif page == "Machine Learning Prediction":
     st.title('🤖 Machine Learning Prediction')
@@ -290,7 +293,7 @@ def chat_with_data(df_chat, input_text, api_key):
         """
 
         # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
+        llm = ChatOpenAI(model_name="gpt-4o-2024-08-06", openai_api_key=api_key)
 
         # Generate response
         response = llm.predict(message)
@@ -301,4 +304,4 @@ def chat_with_data(df_chat, input_text, api_key):
         st.error(f"Error during chat: {e}")
 
 if __name__ == "__main__":
-    main()
+    st.sidebar.write("Please select a page from the navigation sidebar.")
