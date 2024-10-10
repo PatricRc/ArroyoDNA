@@ -1,14 +1,82 @@
+import pandas as pd
+import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd
 import numpy as np
-import streamlit as st
 import io
 import requests
 from sklearn.ensemble import RandomForestRegressor
-from pandasai import SmartDataframe
-from pandasai.llm import OpenAI
 import os
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.chains import ConversationalRetrievalChain
+
+@st.cache_data
+def load_data(uploaded_file):
+    """Load data from the uploaded file."""
+    try:
+        # Load based on file type
+        if uploaded_file.name.endswith("xlsx"):
+            df = pd.read_excel(uploaded_file, engine='openpyxl')
+        elif uploaded_file.name.endswith("csv"):
+            df = pd.read_csv(uploaded_file)
+        else:
+            st.error("Unsupported file type.")
+            return None
+
+        # Columns to keep
+        columns_to_keep = [
+            'ID', 'Roles', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
+            'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
+            'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
+            'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
+            'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
+            'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
+        ]
+        columns_to_keep = [col for col in columns_to_keep if col in df.columns]
+        df = df[columns_to_keep]
+
+        # Convert 'Roles' column to string if it exists
+        if 'Roles' in df.columns:
+            df['Roles'] = df['Roles'].astype(str)
+
+        return df
+
+    except Exception as e:
+        st.error(f"Error processing the file: {e}")
+        return None
+
+def chat_with_data(df_chat, input_text, api_key):
+    """Chat with the survey data using OpenAI."""
+    try:
+        # Convert DataFrame to a format suitable for context
+        context = df_chat.to_string(index=False)
+
+        # Create a prompt template
+        message = f"""
+        Answer the following question using the context provided:
+
+        Context:
+        {context}
+
+        Question:
+        {input_text}
+
+        Answer:
+        """
+
+        # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=api_key)
+
+        # Generate response
+        response = llm.predict(message)
+
+        st.write(response)
+
+    except Exception as e:
+        st.error(f"Error during chat: {e}")
 
 # Load the dataset from the GitHub repository
 file_url = 'https://raw.githubusercontent.com/PatricRc/ArroyoDNA/main/Human%20Skills%20Resultados%20%201.xlsx'
@@ -52,7 +120,6 @@ if page == "Survey EDA":
     st.title('📈 Employee Survey EDA')
 
     # Filters for DataFrame
-    # Filters on the page
     top_20_roles = df.groupby('Rol')['ID'].nunique().sort_values(ascending=True).head(20).index.tolist()
     all_roles = df['Rol'].unique().tolist()
 
@@ -126,30 +193,30 @@ if page == "Survey EDA":
         plt.figure(figsize=(5, 3))
         sns.heatmap(filtered_df.select_dtypes(include=[np.number]).corr(), annot=False, cmap='viridis')
         st.pyplot(plt)
-            
+
         # Distribution of Age
         st.subheader('Distribution of Age')
         plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Edad'], kde=True, color='blue')
         st.pyplot(plt)
-            
+
         # Gender Countplot
         st.subheader('Gender Distribution')
         plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='Genero', palette='Set2')
         st.pyplot(plt)
-            
+
         # Experience vs. Nivel de inglés
         st.subheader('Years of Experience vs. Nivel de inglés')
         plt.figure(figsize=(5, 3))
         sns.scatterplot(data=filtered_df, x='Años de experiencia', y='Nivel de inglés', hue='Genero', palette='Set1')
         st.pyplot(plt)
-            
+
         # Distribution of Nivel de inglés
         st.subheader('Distribution of Nivel de inglés')
         plt.figure(figsize=(5, 3))
         sns.histplot(filtered_df['Nivel de inglés'], kde=True, color='green')
-        st.pyplot(plt)    
+        st.pyplot(plt)
 
         # Relationship between Age and Nivel de inglés
         st.subheader('Age vs. Nivel de inglés')
@@ -158,55 +225,58 @@ if page == "Survey EDA":
         plt.figure(figsize=(5, 3))
         sns.regplot(data=filtered_df, x='Edad', y='Nivel de inglés', scatter_kws={'alpha':0.5}, line_kws={'color':'red'})
         st.pyplot(plt)
-            
+
         # Pairplot to observe relationships between select numerical features
         st.subheader('Pairplot of Selected Numerical Features')
         selected_features = ['Edad', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
         sns.pairplot(filtered_df[selected_features], height=4)
         st.pyplot(plt)
-            
+
         # Summary of categorical features
         st.subheader('Summary of Categorical Features')
         st.write(filtered_df.describe(include=['object']))
-        
+
         # Countplot of Country
         st.subheader('Country Distribution')
         plt.figure(figsize=(5, 3))
         sns.countplot(data=filtered_df, x='País', palette='viridis')
         plt.xticks(rotation=45)
         st.pyplot(plt)
-            
+
         # Feature Importance Section
         st.subheader('Feature Importance for Predicting Employee Adaptability')
-        
+
         # Prepare data for feature importance calculation
         excluded_columns = ['ID', 'Rol', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés']
-        X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
-        y = filtered_df['Adaptabilidad']
-        
-        # One-hot encoding for categorical variables
-        X = pd.get_dummies(X, drop_first=True)
-        
-        # Train a Random Forest model to determine feature importance
-        model = RandomForestRegressor(n_estimators=100, random_state=42)
-        model.fit(X, y)
-        
-        # Get feature importances from the model
-        feature_importances = model.feature_importances_
-        
-        # Create a DataFrame for feature importance
-        importance_df = pd.DataFrame({
-            'Feature': X.columns,
-            'Importance': feature_importances
-        }).sort_values(by='Importance', ascending=False)
-        
-        # Plot the top 15 most important features
-        plt.figure(figsize=(5, 3))
-        sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
-        plt.title('Top 15 Important Features for Predicting Employee Adaptability')
-        plt.xlabel('Importance')
-        plt.ylabel('Feature')
-        st.pyplot(plt)
+        if 'Adaptabilidad' in filtered_df.columns:
+            X = filtered_df.drop(columns=[col for col in excluded_columns if col in filtered_df.columns] + ['Adaptabilidad'])
+            y = filtered_df['Adaptabilidad']
+
+            # One-hot encoding for categorical variables
+            X = pd.get_dummies(X, drop_first=True)
+
+            # Train a Random Forest model to determine feature importance
+            model = RandomForestRegressor(n_estimators=100, random_state=42)
+            model.fit(X, y)
+
+            # Get feature importances from the model
+            feature_importances = model.feature_importances_
+
+            # Create a DataFrame for feature importance
+            importance_df = pd.DataFrame({
+                'Feature': X.columns,
+                'Importance': feature_importances
+            }).sort_values(by='Importance', ascending=False)
+
+            # Plot the top 15 most important features
+            plt.figure(figsize=(5, 3))
+            sns.barplot(x='Importance', y='Feature', data=importance_df.head(15), palette='magma')
+            plt.title('Top 15 Important Features for Predicting Employee Adaptability')
+            plt.xlabel('Importance')
+            plt.ylabel('Feature')
+            st.pyplot(plt)
+        else:
+            st.write("The column 'Adaptabilidad' is not present in the dataset for feature importance calculation.")
 
 elif page == "Machine Learning Prediction":
     st.title('🤖 Machine Learning Prediction')
@@ -216,51 +286,22 @@ elif page == "Chat with Survey Data":
     st.title('💬 Chat with Survey Data')
 
     # File upload for survey data
-    uploaded_file = st.file_uploader("Upload the survey Excel file", type=["xlsx"])
+    uploaded_file = st.file_uploader("Upload the survey Excel or CSV file", type=["xlsx", "csv"])
     if uploaded_file is not None:
-        try:
-            df_chat = pd.read_excel(uploaded_file, engine='openpyxl')
-            existing_columns = df_chat.columns.tolist()
-            columns_to_keep_chat = [
-                'ID', 'Roles', 'Genero', 'Edad', 'País', 'Meses en Arroyo', 'Años de experiencia', 'Nivel de inglés',
-                'Autogestión', 'Compromiso con la excelencia', 'Trabajo en equipo', 'Comunicación efectiva',
-                'Pensamiento ánalitico', 'Adaptabilidad', 'Responsabilidad', 'Atención al detalle',
-                'Liderazgo', 'Gestión de problemas', 'Orientación a resultados', 'Pensamiento estratégico',
-                'Apertura', 'Iniciativa', 'Orientación al cliente', 'Autoaprendizaje',
-                'Tolerancia a la presión', 'Negociación', 'Discreción', 'Integridad'
-            ]
-            columns_to_keep_chat = [col for col in columns_to_keep_chat if col in existing_columns]
-            df_chat = df_chat[columns_to_keep_chat]
-
-            # Convert 'Roles' column to string if exists
-            if 'Roles' in df_chat.columns:
-                df_chat['Roles'] = df_chat['Roles'].astype(str)
-
-            st.write("Survey data loaded successfully.")
+        df_chat = load_data(uploaded_file)
+        if df_chat is not None:
+            st.success("Survey data loaded successfully.")
             st.write(df_chat.head())
 
             # Text input for OpenAI API Key
             api_key = st.text_input("Enter your OpenAI API Key", type="password")
 
             # Enter the query for analysis
-            st.info("Chat Below")
-            input_text = st.text_area("Enter the query")
+            input_text = st.text_area("Enter your query")
 
             # Perform analysis
-            if input_text and api_key:
-                if st.button("Chat with data"):
-                    st.info("Your Query: " + input_text)
+            if input_text and api_key and st.button("Chat with data"):
+                chat_with_data(df_chat, input_text, api_key)
 
-                    # Initialize OpenAI LLM with model 'gpt-3.5-turbo'
-                    llm = OpenAI(api_token=api_key, model="gpt-3.5-turbo")
-                    pandas_ai = SmartDataframe(df_chat, config={"llm": llm})
-                    result = pandas_ai.chat(str(input_text))
-                    if isinstance(result, pd.DataFrame):
-                        st.dataframe(result)
-                    elif isinstance(result, str) and result.endswith('.png'):
-                        st.image(result)
-                    else:
-                        st.success(result)
-
-        except Exception as e:
-            st.error(f"Error processing the file: {e}")
+if __name__ == "__main__":
+    st.sidebar.write("Please select a page from the navigation sidebar.")
