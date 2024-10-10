@@ -9,3 +9,5 @@ pandasai
 requests
 PyYAML
 langchain
+chromadb
+langchain-community
